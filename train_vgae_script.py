@@ -87,7 +87,7 @@ def get_weight_sparse(path):
     elif "sparse_deep" in path:
         model = MLP_sparse_deep()
     elif "sparse_wide" in path:
-        model = MLP_sparse_wide()
+        model = MLP_sparse_wide(
     elif "dense" in path:
         model = MLP_dense()
     
@@ -281,7 +281,7 @@ for i in (range(epochs)):
     if mean_auc > best_auc:
         torch.save(
             model.state_dict(),
-            f"{vgae_model_path}/best_autoencoder_{current_model_name}.pth"
+            f"{vgae_model_path}/best_autoencoder_{current_model_name}_{i}.pth"
         )
         best_auc = mean_auc
 
