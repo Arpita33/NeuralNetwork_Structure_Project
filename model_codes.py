@@ -6,10 +6,14 @@ class MLP_dense(nn.Module):
     def __init__(self):
         super(MLP_dense, self).__init__()
                 #give name to each layer
-        self.fc1 = sl.SparseLinear(1024, 1000, sparsity=0)
-        self.fc2 = sl.SparseLinear(1000, 200 , sparsity=0)
-        self.fc3 = sl.SparseLinear(200, 300, sparsity=0)
-        self.fc4 = sl.SparseLinear(300, 6, sparsity=0) 
+        # self.fc1 = sl.SparseLinear(1024, 1000, sparsity=0)
+        # self.fc2 = sl.SparseLinear(1000, 200 , sparsity=0)
+        # self.fc3 = sl.SparseLinear(200, 300, sparsity=0)
+        # self.fc4 = sl.SparseLinear(300, 6, sparsity=0) 
+        self.fc1 = nn.Linear(1024, 500)
+        self.fc2 = nn.Linear(500, 200)
+        self.fc3 = nn.Linear(200, 300)
+        self.fc4 = nn.Linear(300, 6) 
         self.relu = nn.ReLU()
 
 
