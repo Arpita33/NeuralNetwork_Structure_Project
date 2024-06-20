@@ -14,9 +14,9 @@ from graph_encoder import *
 
 mlp_checkpoints_path = "/home/arpita-local/nn_structure_project/mlp_checkpoints"
 pyg_graphs_path = "/home/arpita-local/nn_structure_project/pyg_graphs"
-vgae_model_path = "/home/arpita-local/nn_structure_project/vgae_models"
+vgae_model_path = "/home/arpita-local/nn_structure_project/vgae_models/dense"
 
-DEVICE = "cuda:4" if torch.cuda.is_available() else "cpu"
+DEVICE = "cuda:2" if torch.cuda.is_available() else "cpu"
 print(DEVICE)
 current_model_name = "dense"
 
@@ -55,24 +55,22 @@ def convert_weights_to_adjacency(weights):
     return adj_matrix
 
 def get_weight(path):
-    print(path)
+    # print(path)
 
-    if "sparse_deep2" in path:
-        model = MLP_sparse_deep2()
-    elif "sparse_deep" in path:
-        model = MLP_sparse_deep()
-    elif "sparse_wide" in path:
-        model = MLP_sparse_wide()
-
+    # if "sparse_deep2" in path:
+    #     model = MLP_sparse_deep2()
+    # elif "sparse_deep" in path:
+    #     model = MLP_sparse_deep()
+    # elif "sparse_wide" in path:
+    #     model = MLP_sparse_wide()
+    model = MLP_dense()
     model.load_state_dict(torch.load(path))
-    print("buffers")
-    print(model.buffers())
 
     weights = []
     with torch.no_grad():
         for name, param in model.named_parameters():
             # Do something with the name and the parameter tensor (e.g., append to weights)
-            print(name)
+            #print(name)
             param=param.detach().numpy() 
             weights.append(param)
 
@@ -87,9 +85,9 @@ def get_weight_sparse(path):
     elif "sparse_deep" in path:
         model = MLP_sparse_deep()
     elif "sparse_wide" in path:
-        model = MLP_sparse_wide(
-    elif "dense" in path:
-        model = MLP_dense()
+        model = MLP_sparse_wide()
+    # elif "dense" in path:
+    #     model = MLP_dense()
     
     #print(path)
     model.load_state_dict(torch.load(path))
@@ -128,7 +126,10 @@ def get_pyg_graphs(nx_graph: nx.DiGraph):
 
 def process_checkpoint(ckpt):
     # epoch_number=int(ckpt.split('_')[1].split('.')[0])
-    weights=get_weight_sparse(ckpt)
+    if "dense" in ckpt:
+        weights = get_weight(ckpt)
+    else:
+        weights=get_weight_sparse(ckpt)
     layer_count = 0
     weights_without_biases= []
     for layer in weights:
@@ -232,9 +233,9 @@ def train_vgae(model, datas, optimizer):
     model.to(DEVICE)
     total_loss = 0
     total_ap, total_auc = 0, 0
+    #print("here")
     #print(datas)
     for data in tqdm(datas):
-        
         #path = f"/home/arpita-local/pyg_graphs/{data}"
         path = f"{pyg_graphs_path}/{current_model_name}/{data}"
         g_data = pickle.load(open(path, "rb")).to(DEVICE)
